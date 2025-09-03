@@ -1,0 +1,52 @@
+// Sensor Kebakaran dengan MQ2, LED Traffic Light, dan Buzzer
+// Board: Arduino Uno R3
+
+#define MQ2_PIN   A0   // MQ2 analog input
+#define LED_HIJAU 2
+#define LED_KUNING 3
+#define LED_MERAH 4
+#define BUZZER    5   // low-level trigger (LOW = bunyi)
+
+int sensorValue = 0;
+int threshold1 = 70;  // level waspada
+int threshold2 = 300;  // level bahaya
+
+void setup() {
+  pinMode(LED_HIJAU, OUTPUT);
+  pinMode(LED_KUNING, OUTPUT);
+  pinMode(LED_MERAH, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  digitalWrite(BUZZER, HIGH); // buzzer mati di awal (karena low trigger)
+  Serial.begin(9600);
+}
+
+void loop() {
+  sensorValue = analogRead(MQ2_PIN);
+  Serial.print("Nilai MQ2: ");
+  Serial.println(sensorValue);
+
+  if (sensorValue >= threshold2) {
+    // Bahaya
+    digitalWrite(LED_HIJAU, LOW);
+    digitalWrite(LED_KUNING, LOW);   // pastikan kuning mati
+    digitalWrite(LED_MERAH, HIGH);
+    digitalWrite(BUZZER, LOW);       // buzzer nyala (low trigger)
+  } 
+  else if (sensorValue >= threshold1 && sensorValue < threshold2) {
+    // Waspada
+    digitalWrite(LED_HIJAU, LOW);
+    digitalWrite(LED_KUNING, HIGH);
+    digitalWrite(LED_MERAH, LOW);
+    digitalWrite(BUZZER, HIGH);      // buzzer mati
+  } 
+  else {
+    // Aman
+    digitalWrite(LED_HIJAU, HIGH);
+    digitalWrite(LED_KUNING, LOW);
+    digitalWrite(LED_MERAH, LOW);
+    digitalWrite(BUZZER, HIGH);      // buzzer mati
+  }
+
+  delay(200); // delay biar serial lebih enak dibaca
+}
